@@ -5,7 +5,7 @@
 
 ^Hello!
 
----
+-----
 
 ^
 * "what are closures" interview question
@@ -13,7 +13,7 @@
 * answer "does Python even have closures?"
 * why don't we see nonlocal all that much
 
----
+----
 
 ## what closures are
 ## Python functions have always been closures
@@ -24,7 +24,7 @@
 
 ^Then we'll look at how it's used and I'll speculate a bit about why it isn't used.
 
----
+----
 
 # Closure:
 
@@ -33,14 +33,14 @@
 ^The notion that code of some kind - we'll say functions here - are more than
 their source code.
 
----
+----
 
 ^Python functions are closures because the text of the function alone is not
 sufficient for Python to run the function.
 The environment where the function was defined is also used to determine its
 behavior.
 
----
+----
 
 ^I have two utility modules for formatting strings.
 One is for html, the other is for outputting text to the terminal.
@@ -49,14 +49,14 @@ One is for html, the other is for outputting text to the terminal.
 ^I'm going to import these two functions, then look at their source code
 with the inspect module, a Python standard library module.
 
----
+----
 
 ~~~
 >>> from htmlformat import bold as htmlbold
 >>> from terminalformat import bold as termbold
 ~~~
 
----
+----
 
 ~~~
 
@@ -71,7 +71,7 @@ with the inspect module, a Python standard library module.
 
 ~~~
 
----
+----
 
 ~~~
 
@@ -86,7 +86,7 @@ def bold(text):
 
 ~~~
 
----
+----
 
 ~~~
 
@@ -101,7 +101,7 @@ def bold(text):
     return '{}{}{}'.format(BOLDBEFORE, text, BOLDAFTER)
 ~~~
 
----
+----
 
 ~~~
 
@@ -121,7 +121,7 @@ There must be something beyond the source code that determines the behavior
 of these functions, and I assert that's the respective environments in which
 the functions were defined.
 
----
+----
 
 ~~~
 >>> htmlbold('eggplant')
@@ -130,7 +130,7 @@ the functions were defined.
 
 ~~~
 
----
+----
 
 ~~~
 >>> htmlbold('eggplant')
@@ -141,12 +141,12 @@ the functions were defined.
 
 ^]
 
----
+----
 
 ^Hold onto that question of how what those environments are for a moment,
 we've got our first quiz:
 
----
+----
 
 
     >>> from htmlformat import bold as htmlbold
@@ -155,7 +155,7 @@ we've got our first quiz:
 
 ^What will this print?
 
----
+----
 
     >>> from htmlformat import bold as htmlbold
     >>> BEFOREBOLD = 'Written in sharpie: '
@@ -165,7 +165,7 @@ we've got our first quiz:
 ^Why is this?
 That's right these are different global variables!
 
----
+----
 
     #htmlformat.py                   #terminalformat.py
 
@@ -181,20 +181,20 @@ That's right these are different global variables!
 ^Different global variables, and it seems like they each use their own global variables!
 "global" is not a great name
 
----
+----
 
 #global variables aren't "global"
 
 ^They aren't universal across your whole program,
 they're really module level variables.
 
----
+----
 
 ^Since we're stuck with the word "global," we should
 think of each module as being a separate globe...
 
 
----
+----
 
 ![](https://upload.wikimedia.org/wikipedia/commons/2/2d/Venus_Earth_Comparison.png)
 
@@ -213,14 +213,14 @@ think of each module as being a separate globe...
 
 ^Modules as being separate globes
 
----
+----
 
 ![](./peridotplanet.png)
 
 ^And our function objects have a link to their home world,
 they know where they came from.
 
----
+----
 
 ```python
 >>> from htmlformat import bold
@@ -236,7 +236,7 @@ they know where they came from.
 where it was defined, and more importantly to the dictionary of the global
 variables in the module.
 
----
+----
 
 ```python
 >>> from htmlformat import bold
@@ -250,7 +250,7 @@ dict_keys(['BEFOREBOLD', 'AFTERBOLD', 'bold',
 
 ^On the function object we find a reference to a dictionary of the global variables
 
----
+----
 
 ```python
 >>> from htmlformat import bold
@@ -271,18 +271,18 @@ this is a live link back to that home planet!
 It's the very same object as the namespace of the module!
 
 
----
+----
 
 ^Because these are the same namespace, what if we were to change a binding in that namespace?
 
----
+----
 
     BEFOREBOLD = '<span class="bold">
     AFTERBOLD = '</span>'
 
 ^What happens when I add this code to the bottom on htmlformat?
 
----
+----
 
 ![](https://upload.wikimedia.org/wikipedia/commons/2/2d/Venus_Earth_Comparison.png)
 
@@ -302,12 +302,12 @@ It's the very same object as the namespace of the module!
 
 ^Modules as being separate globes
 
----
+----
 
     >>> from htmlformat import bold
     >>> bold('eggplant')
 
----
+----
 
     >>> from htmlformat import bold
     >>> bold('eggplant')
@@ -316,18 +316,18 @@ It's the very same object as the namespace of the module!
 ^We're going to use the new values because it's about the values
 of the variables when we call the function, not when we define the function.
 
----
+----
 
 ^We can even modify these variables from outside the module!
 
----
+----
 
     >>> from htmlformat import bold
     >>> import htmlformat
     >>> htmlformat.BEFOREBOLD = 'READ THIS--> '
     >>> bold('eggplant')
 
----
+----
 
     >>> from htmlformat import bold
     >>> import htmlformat
@@ -337,11 +337,11 @@ of the variables when we call the function, not when we define the function.
 
 ^Once again, it's about the value of the variable when the function is called.
 
----
+----
 
 ^Sometimes it's hard not to expect templating behavior of using the value of a variable at the time the function was defined instead of at the time when the function is called.
 
----
+----
 
 ~~~python
 formatters = {}
@@ -356,7 +356,7 @@ formatters['green']('hello')
 ~~~
 ^What will this do?
 
----
+----
 
 ~~~python
 formatters = {}
@@ -372,11 +372,11 @@ formatters['green']('hello')
 ~~~
 ^Does this help?
 
----
+----
 
 <span style="color:blue">hello</span>
 
----
+----
 
 #[fit]Python functions: totally closures!
 
@@ -388,7 +388,7 @@ One important detail and one big idea:
 ^Next let's look at how Python figures out how to close the
 variables we use in a function
 
----
+----
 
 # How closures work in Python
 
@@ -398,7 +398,7 @@ the home module, and which ones don't need to be.
 For as long as Python has been available on the internet,
 there have been at least two kinds of variables:
 
----
+----
 
 * local variables: `func.__code__.co_varnames`
 * "phone home" global variables: `func.__code__.co_names`
@@ -407,7 +407,7 @@ there have been at least two kinds of variables:
 Let's be the interpreter and look for patterns in our decisions
 about which is which.
 
----
+----
 
 #Be the interpreter
 
@@ -419,7 +419,7 @@ about which is which.
 
 ^Is phrase a local variables, or module-level "global" variable?
 
----
+----
 
 #Be the interpreter
 
@@ -430,7 +430,7 @@ about which is which.
 ~~~
 #[fit]phrase
 
----
+----
 
 #Be the interpreter
 
@@ -441,7 +441,7 @@ about which is which.
 ~~~
 #[fit]capitalized
 
----
+----
 
 #Be the interpreter
 
@@ -457,7 +457,7 @@ about which is which.
 
 ~~~
 
----
+----
 
 #Be the interpreter
 
@@ -468,7 +468,7 @@ about which is which.
 ...     return options[1]
 ~~~
 
----
+----
 
 #Be the interpreter
 
@@ -480,7 +480,7 @@ about which is which.
 ~~~
 #[fit]phrase
 
----
+----
 
 #Be the interpreter
 
@@ -492,7 +492,7 @@ about which is which.
 ~~~
 #[fit]options
 
----
+----
 
 #Be the interpreter
 
@@ -504,7 +504,7 @@ about which is which.
 ~~~
 #[fit]DEFAULT_TITLE
 
----
+----
 
 #Be the interpreter
 
@@ -516,7 +516,7 @@ about which is which.
 ~~~
 #[fit]catchiness
 
----
+----
 
 #Be the interpreter
 
@@ -535,7 +535,7 @@ about which is which.
 ^If its important that that function is defined in that file - i.e. you can't
 copy and paste it into your file - then it's closing over the environment.
 
----
+----
 
 ~~~python
 >>> def shortened(phrase):
@@ -547,7 +547,7 @@ copy and paste it into your file - then it's closing over the environment.
 ^Something tricky: one of the things Python uses to determine if it's a local
 variables is whether assignment occurs. But what if you wanted to assign to a global variable?
 
----
+----
 
 ~~~
 >>> HIGH_SCORE = 1000
@@ -560,7 +560,7 @@ variables is whether assignment occurs. But what if you wanted to assign to a gl
 ~~~
 ^What error will we get here?
 
----
+----
 
 ~~~
 >>> HIGH_SCORE = 1000
@@ -578,7 +578,7 @@ referenced before assignment
 ~~~
 ^Why is that? Because HIGH_SCORE is a local variable!
 
----
+----
 
 ~~~
 >>> HIGH_SCORE = 1000
@@ -594,7 +594,7 @@ referenced before assignment
 >>>
 ~~~
 
----
+----
 
 ~~~
 >>> HIGH_SCORE = 1000
@@ -612,11 +612,11 @@ old high score: 1000
 ^So the global keyword lets us bypass Python's heuristic and specify the scope
 of a variable
 
----
+----
 
 ^How are we doing so far?
 
----
+----
 
 #In review, the
 #[fit]Scope|Value
@@ -624,7 +624,7 @@ of a variable
 #[fit]Definition|Execution
 #time
 
----
+----
 
 ~~~
  
@@ -642,13 +642,13 @@ of a variable
 ~~~
 ^BUT big changes were coming in Python 2.1
 
----
+----
 
 ^Functions in Python have always closed over their module-level environment.
 But before Python 2.1 in 2000, functions didn't close over scopes of outer
 functions!
 
----
+----
 
 ~~~python
 def tallest_building():
@@ -664,7 +664,7 @@ def tallest_building():
 
 ^let's be the interpreter here
 
----
+----
 
 ~~~python
 def tallest_building():
@@ -681,7 +681,7 @@ def tallest_building():
 
 ^if you're being the interpreter, is name a local or a global variable?
 
----
+----
 
 ~~~python
 def tallest_building():
@@ -698,12 +698,12 @@ def tallest_building():
 
 ^if you're being the interpreter, how do categorize the "buildings" variable?
 
----
+----
 ^Sometimes when people talk about closures, they aren't including module-level
 scope, or rather they might say that module-level "global" variables are a special case.
 In Python their implementation is a special case; they're treated differently.
 
----
+----
 
 * local variables: `func.__code__.co_varnames`
 * "phone home" global variables: `func.__code__.co_names`
@@ -711,7 +711,7 @@ In Python their implementation is a special case; they're treated differently.
 
 ^A new kind of variable
 
----
+----
 
 ~~~python
 >>> height.__code__.co_varnames
@@ -724,17 +724,17 @@ In Python their implementation is a special case; they're treated differently.
 
 ^This was optional in Python 2.1, but
 
----
+----
 
 #[fit]Python 2.2 functions: definitely closures now!
 
 ^Also in the year 2001
 
----
+----
 
 ^At thing point function objects got an attribute called "__closure__"!
 
----
+----
 
 ~~~
  
@@ -749,18 +749,18 @@ In Python their implementation is a special case; they're treated differently.
 #[fit]MMVIII (the year 2008)
 ^One more change big change was coming in Python 3
 
----
+----
 
 ^There's still one more thing we can't do, a way that our Python closures are more limited than those of some other languages.
 Remember the problem with global variables, where if we want to assign to a global variable in a function we need to say "global"?
 
----
+----
 
 ^That leads to the phrase "read-only" closures.
 We can access those variables, and if they're mutable objects we can send them
 messages, we can mutate them - but we can't rebind them.
 
----
+----
 
 ~~~python
 >>> def get_number_guesser(answer):
@@ -777,7 +777,7 @@ messages, we can mutate them - but we can't rebind them.
 ~~~
 ^But this isn't going to work. Let's be the interpreter again to see why.
 
----
+----
 
 ~~~python
 >>> def get_number_guesser(answer):
@@ -793,7 +793,7 @@ messages, we can mutate them - but we can't rebind them.
 ^If we're being the Python interpreter here, are these local variables, global
 variables, or from an outer scope?
 
----
+----
 
 ~~~python
 >>> def get_number_guesser(answer):
@@ -806,7 +806,7 @@ variables, or from an outer scope?
 ~~~
 #[fit]answer
 
----
+----
 
 ~~~python
 >>> def get_number_guesser(answer):
@@ -822,7 +822,7 @@ variables, or from an outer scope?
 ^It's going to think it's a local variable because we use assignment here.
 So what error will we get when we run that inner function?
 
----
+----
 
 ~~~python
 >>> def get_number_guesser(answer):
@@ -843,7 +843,7 @@ UnboundLocalError: local variable 'last_guess' referenced before assignment
 
 ^One last puzzle piece: nonlocal!
 
----
+----
 
 ~~~python
 >>> def get_number_guesser(answer):
@@ -859,7 +859,7 @@ UnboundLocalError: local variable 'last_guess' referenced before assignment
 ^Add a hint to the Python interpreter when we define the function:
 we mean the outer variable, not a new one.
 
----
+----
 
 ~~~python
 >>> def get_number_guesser(answer):
@@ -879,13 +879,13 @@ already guessed that!
 False
 ~~~
 
----
+----
 
 #[fit]Python functions are definitely closures now!
 
 ^OK? Feeling alright with that?
 
----
+----
 
 ~~~
  
@@ -903,13 +903,13 @@ False
 
 ^What's left is how closures are used in Python.
 
----
+----
 
 #[fit]How closures are used in Python
 
 ^one answer is anytime you use a function, that's a closure
 
----
+----
 
 #[fit]Global variables
 #[fit]`(`any function with`.__code__.co_names``)`
@@ -918,11 +918,11 @@ False
 If you function calls other functions in the same module, that's using the
 fact that the function is a closure!
 
----
+----
 
 ^or maybe we aren't counting that, and it only counts when
 
----
+----
 
 #[fit]Variables from outer scopes besides globals
 #[fit]`(`any function with`.__code__.co_freevars``)`
@@ -931,7 +931,7 @@ fact that the function is a closure!
 considered closures because we're so used to that behavior, so when
 do we use those `co_freevars` from outer functions?
 
----
+----
 
 * inner functions
 * lambdas for key, cmp functions
@@ -945,7 +945,7 @@ do we use those `co_freevars` from outer functions?
 ^Someimes these are "pure" functions, but often they use state from arround
 Whenever you write a function that does something interesting.
 
----
+----
 
 * decorators
 
@@ -957,16 +957,16 @@ def get_current_time():
 
 ^Decorators usually define a new function that references the old one.
 
----
+----
 
 #[fit]`(`any function with`.__code__.co_freevars``)`
 
----
+----
 
 ^What about the definition of closure that says you have to be able to rebind
 the variables in outer scopes that aren't the global scope?
 
----
+----
 
 #[fit]"read/write" closures
 #[fit]"rebinding" closures
@@ -977,7 +977,7 @@ the variables in outer scopes that aren't the global scope?
 ^One reason why not is that many people still write code
 that works on both Python 3 and Python 2.
 
----
+----
 
 ~~~python
 def decorating_function(user_function):
@@ -994,11 +994,11 @@ heavily abridged [Django code](https://github.com/django/django/blob/master/djan
 a workaround: stick the variable in a mutable object!
 
 
----
+----
 
 ^We have modules, we have a nice object system (method binding)...
 
----
+----
 
 ~~~python
 def tallest_building():
@@ -1011,11 +1011,11 @@ def tallest_building():
 
 ^Method binding, and we don't hide data...
 
----
+----
 
 ^The next code sample is the most complicated one we've seen yet.
 
----
+----
 
 ~~~python
 >>> class Person(object): pass
@@ -1042,20 +1042,20 @@ AttributeError: 'Problem' object has no attribute 'age'
 ^Now this is totally possible in JavaScript and Python. But culturally we
 don't do it in Python.
 
----
+----
 
 #[fit]Getting our closure
 
 ^And I think it's fine that we don't use rebinding closures all that much.
 
----
+----
 
 #[fit]use `nonlocal` when appropriate
 
 ^So why use nonlocal? Because it more precisely expresses what we mean!
 No need to go looking for uses of it, but they do pop up!
 
----
+----
 
 #[fit]Getting our closure
 
@@ -1069,13 +1069,13 @@ that aren't the global scope.
 
 ^Sometimes we say only functions that use this capability are closures.
 
----
+----
 
 #[fit]Getting our closure
 
 ^Sometimes we mean rebinding closures, all of which Python has!
 
----
+----
 
 #[fit]Getting our closure
 
@@ -1084,7 +1084,7 @@ closures, we can join right in!
 
 ^We use closures all the time in Python, just look for .co_freevars on your function objects if you're wondering if something is taking advantage of being a closure.
 
----
+----
 
 #[fit]Closure closures closed closures closure clojure closures.
 
@@ -1094,7 +1094,7 @@ closures, we can join right in!
 
 ^Thank you!
 
----
+----
 
 #Thank you
 Thomas Ballinger
@@ -1107,7 +1107,7 @@ Image credit:
 
 `https://en.wikipedia.org/wiki/Colonization_of_Venus#/media/File:Venus_Earth_Comparison.png`
 
----
+----
 
 #Want to find out more?
 * names - http://nedbatchelder.com/text/names.html
