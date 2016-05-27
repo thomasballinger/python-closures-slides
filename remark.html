@@ -40,13 +40,16 @@
       .remark-code{
         font-size: 1.6em;
         overflow-x: visible !important;
+        line-height: 1.2em;
+        background: none !important;
+      }
+
+      .widecode .remark-code, .twofilescode .remark-code{
         margin-left: -100px;
         margin-right: -100px;
         margin-top: -100px;
         padding-top: 80px !important;
         padding-left: 35px !important;
-        line-height: 1.2em;
-        background: none !important;
       }
 
       .twofilescode .remark-code{
@@ -92,7 +95,6 @@
         });
       }
     </script>
-
   </head>
   <body>
     <textarea id="source">
@@ -116,11 +118,11 @@ class: center, middle, huge
 class: listitemsfillwidth
 
 TODO: REWRITE THIS OUTLINE
-* what is a closure
-* Python functions have always been closures
+* code + environment
 * how Python determines variable scope
-* Python 2.2: functions are really closures now
-* Python 3: now functions are definitely closures
+* Python 1.0 functions: sorta not quite closures
+* Python 2.2: functions are closures now
+* Python 3: now functions are really closures
 
 ---
 
@@ -150,6 +152,7 @@ I'm going to import these two functions, then look at their source code
 with the inspect module, a Python standard library module.
 
 ---
+class: widecode
 
 ~~~
 >>> 
@@ -159,6 +162,7 @@ with the inspect module, a Python standard library module.
 I'm going to open up the interactive Python interpreter
 
 ---
+class: widecode
 
 ~~~
 >>> from htmlformat import bold as htmlbold
@@ -167,6 +171,7 @@ I'm going to open up the interactive Python interpreter
 ~~~
 
 ---
+class: widecode
 
 ~~~
 >>> from htmlformat import bold as htmlbold
@@ -183,6 +188,7 @@ I'm going to open up the interactive Python interpreter
 ~~~
 
 ---
+class: widecode
 
 ~~~
 >>> from htmlformat import bold as htmlbold
@@ -200,6 +206,7 @@ I'm going to open up the interactive Python interpreter
 ~~~
 
 ---
+class: widecode
 
 ~~~
 >>> from htmlformat import bold as htmlbold
@@ -217,6 +224,7 @@ def bold(text):
 ~~~
 
 ---
+class: widecode
 
 
 ~~~
@@ -228,7 +236,7 @@ def bold(text):
 ~~~
 
 ???
-But when I use they, they're going to have different behavior.
+But when I use them, they're going to have different behavior.
 There must be something beyond the source code that determines the behavior
 of these functions, and I assert that's the respective environments in which
 the functions were defined.
@@ -264,18 +272,54 @@ we've got our first quiz:
 
 ~~~
 >>> from htmlformat import bold as htmlbold
->>> BEFOREBOLD = '(write this in Sharpie) '
+>>> def signbold(phrase):
+...     BEFOREBOLD = '(in Sharpie) '
+...     return htmlbold(phrase)
+...
+>>> signbold('eggplant')
+~~~
+
+???
+What will this print? Will Python use this new value, or will it keep its old behavior?
+
+You know, before you tell me, this is a pretty interesting question.
+---
+
+background-image: url(./theFunctionOfFunction.png)
+
+???
+"From an implementation point of view, it is obvious which environment... the activation
+environment. ... Unfortunately the programmer would usually like to have the free variables
+have the 
+
+
+???
+In a 1970 paper describing implementing programming languages that used these two approaches,
+Joel Moses says "
+
+
+
+---
+~~~
+>>> from htmlformat import bold as htmlbold
+>>> BEFOREBOLD = '(in Sharpie) '
 >>> htmlbold('eggplant')
 ~~~
 
 ???
 What will this print?
 
+It's either "in Sharpie" or "b tag".
+
+---
+
+
+
 ---
 
 ~~~
 >>> from htmlformat import bold as htmlbold
->>> BEFOREBOLD = '(write this in Sharpie) '
+>>> BEFOREBOLD = '(in Sharpie) '
 >>> htmlbold('eggplant')
 '<b>eggplant</b>'
 ~~~
@@ -326,7 +370,8 @@ think of each module as being a separate globe...
 ---
 class: twofilescode twoplanets
 
-![](https://upload.wikimedia.org/wikipedia/commons/2/2d/Venus_Earth_Comparison.png)
+
+![](./Venus_Earth_Comparison.png)
      
 ~~~
 #htmlformat.py                   #terminalformat.py
@@ -356,7 +401,7 @@ they know where they came from.
 
 ```python
 >>> from htmlformat import bold
->>> bold.__module__
+*>>> bold.__module__
 'htmlformat'
 
 
@@ -375,10 +420,11 @@ variables in the module.
 >>> from htmlformat import bold
 >>> bold.__module__
 'htmlformat'
->>> bold.__globals__.keys()
+*>>> bold.__globals__.keys()
 dict_keys(['BEFOREBOLD', 'AFTERBOLD', 'bold',
-'__name__', '__builtins__', '__cached__', '__spec__',
-'__package__', '__doc__', '__loader__', '__file__'])
+'__name__', '__builtins__', '__cached__',
+'__spec__', '__package__', '__doc__',
+'__loader__', '__file__'])
 ```
 
 ???
@@ -392,10 +438,11 @@ On the function object we find a reference to a dictionary of the global variabl
 'htmlformat'
 >>> bold.__globals__.keys()
 dict_keys(['BEFOREBOLD', 'AFTERBOLD', 'bold',
-'__name__', '__builtins__', '__cached__', '__spec__',
-'__package__', '__doc__', '__loader__', '__file__'])
+'__name__', '__builtins__', '__cached__',
+'__spec__', '__package__', '__doc__',
+'__loader__', '__file__'])
 >>> import htmlformat
->>> vars(htmlformat) is bold.__globals__
+*>>> vars(htmlformat) is bold.__globals__
 True
 
 ```
@@ -423,39 +470,123 @@ What happens when I add this code to the bottom on htmlformat?
 
 ---
 
-![](https://upload.wikimedia.org/wikipedia/commons/2/2d/Venus_Earth_Comparison.png)
+class: twofilescode twoplanets
 
-    #htmlformat.py                      
+![](./Venus_Earth_Comparison.png)
 
-    BEFOREBOLD = '<b>'                  
-    AFTERBOLD = '</b>'                  
+~~~
+#htmlformat.py                      
 
-    def bold(text):                     
-        return '{}{}{}'.format(                                    
-          BOLDBEFORE,                   
-          text,                         
-          BOLDAFTER)                    
+BEFOREBOLD = '<b>'                  
+AFTERBOLD = '</b>'                  
 
-    BEFOREBOLD = '<span class="bold">
-    AFTERBOLD = '</span>'
+def bold(text):                     
+    return '{}{}{}'.format(         
+      BOLDBEFORE,                   
+      text,                         
+      BOLDAFTER)                    
+
+*BEFOREBOLD = '<span class="bold">'
+*AFTERBOLD = '</span>'
+~~~
 
 ???
+TODO: map out the order of execution here with moving highlights or something
 Modules as being separate globes
 
 ---
 
-    >>> from htmlformat import bold
-    >>> bold('eggplant')
+~~~
+>>> from htmlformat import bold
+>>> bold('eggplant')
+~~~
+
+???
+Will this print with bold or span tags surrounding this?
 
 ---
 
-    >>> from htmlformat import bold
-    >>> bold('eggplant')
-    '<span class="bold">eggplant</span>
+~~~
+>>> from htmlformat import bold
+>>> bold('eggplant')
+'<span class="bold">eggplant</span>
+>>>
+~~~
 
 ???
 We're going to use the new values because it's about the values
 of the variables when we call the function, not when we define the function.
+
+---
+
+~~~
+*>>> from htmlformat import bold
+>>> bold('eggplant')
+'<span class="bold">eggplant</span>
+>>>
+~~~
+---
+
+class: twofilescode twoplanets
+
+![](./Venus_Earth_Comparison.png)
+~~~
+#htmlformat.py                      
+
+*BEFOREBOLD = '<b>'                  
+*AFTERBOLD = '</b>'                  
+
+def bold(text):                     
+    return '{}{}{}'.format(         
+      BOLDBEFORE,                   
+      text,                         
+      BOLDAFTER)                    
+
+BEFOREBOLD = '<span class="bold">'
+AFTERBOLD = '</span>'
+~~~
+
+---
+
+class: twofilescode twoplanets
+
+![](./Venus_Earth_Comparison.png)
+~~~
+#htmlformat.py                      
+
+BEFOREBOLD = '<b>'                  
+AFTERBOLD = '</b>'                  
+
+*def bold(text):                     
+*   return '{}{}{}'.format(         
+*     BOLDBEFORE,                   
+*     text,                         
+*     BOLDAFTER)                    
+
+BEFOREBOLD = '<span class="bold">'
+AFTERBOLD = '</span>'
+~~~
+
+---
+
+class: twofilescode twoplanets
+
+![](./Venus_Earth_Comparison.png)
+~~~
+#htmlformat.py                      
+
+BEFOREBOLD = '<b>'                  
+AFTERBOLD = '</b>'                  
+
+def bold(text):                     
+    return '{}{}{}'.format(         
+      BOLDBEFORE,                   
+      text,                         
+      BOLDAFTER)                    
+
+*BEFOREBOLD = '<span class="bold">'
+*AFTERBOLD = '</span>'
+~~~
 
 ---
 
@@ -464,18 +595,31 @@ We can even modify these variables from outside the module!
 
 ---
 
-    >>> from htmlformat import bold
-    >>> import htmlformat
-    >>> htmlformat.BEFOREBOLD = 'READ THIS--> '
-    >>> bold('eggplant')
+~~~
+>>> from htmlformat import bold
+*>>> bold('eggplant')
+'<span class="bold">eggplant</span>
+>>>
+~~~
+---
+
+~~~
+>>> from htmlformat import bold
+>>> import htmlformat
+>>> htmlformat.BEFOREBOLD = 'READ THIS--> '
+>>> bold('eggplant')
+~~~
 
 ---
 
-    >>> from htmlformat import bold
-    >>> import htmlformat
-    >>> htmlformat.BEFOREBOLD = 'READ THIS--> '
-    >>> bold('eggplant')
-    'READTHIS--> eggplant</span>
+~~~
+>>> from htmlformat import bold
+>>> import htmlformat
+>>> htmlformat.BEFOREBOLD = 'READ THIS--> '
+>>> bold('eggplant')
+'READTHIS--> eggplant</span>
+>>>
+~~~
 
 ???
 Once again, it's about the value of the variable when the function is called.
@@ -496,7 +640,8 @@ for color in colors:
                 color + '">' + s + '</span>')
     formatters[color] = colored
 
-formatters['green']('hello')
+
+*formatters['green']('hello')
 ~~~
 ???
 What will this do?
@@ -512,7 +657,7 @@ for color in colors:
                 color + '">' + s + '</span>')
     formatters[color] = colored
 
-print(color)
+*print(color)
 formatters['green']('hello')
 ~~~
 ???
@@ -520,25 +665,59 @@ Does this help?
 
 ---
 
+~~~
 <span style="color:blue">hello</span>
+~~~
 
 ---
 
-#[fit]Python functions: totally closures!
-
-???
-By this broad definition of being a combination of code and environment.
-One important detail and one big idea:
-* Python functions hold references to their module evironments
-* These are live links: current values of variables
-
-???
-Next let's look at how Python figures out how to close the
-variables we use in a function
+TODO how to fix this
 
 ---
 
-# How closures work in Python
+TODO 
+
+#Closing free variables: More than one way to do it
+
+???
+Two behaviors we've seen so far:
+
+#functions could copy in data at definition time
+#functions could use values from the function stack to fill in variables
+
+---
+
+Joel Moses writes about this second problem, calling them
+the "binding environment" and the "activation environment."
+
+He then describes the combination of the code that makes up a function and
+the data structure that maintains the binding environment
+information as a "closure."
+
+TODO show the two world example here.
+
+---
+
+Python, and most modern programming languages,
+use what we now call "lexical scope" to determine
+the values of variables, and we can see the data structure
+we use right here: a reference to the module object.
+
+So Python functions have always been closures, right?
+
+Sure, by this very broad definition. But it's a little more complicated
+than that. Too see this, we'll need to look at the kinds of variables we
+have in Python, because there's a class of variables that this system doesn't work with.
+
+---
+
+Two jobs of the Python interpreter:
+* how to determine the scope of a variable
+* how to find the value of a variable
+
+---
+
+# Kinds of variables
 
 ???
 At function definition time, Python analyzes our code
@@ -606,7 +785,14 @@ Is phrase a local variables, or module-level "global" variable?
 >>> movie_titleize.__code__.co_names
 ()
 
+TODO update this with title being in the correct spot, in co_names I think? Check it!
+
 ~~~
+
+???
+By the way, this is a function that would work perfectly well
+without any reference to its module! Since it has only
+local variables, it doesn't really need a module!
 
 ---
 
@@ -1338,7 +1524,7 @@ Image credit:
 
 
     </textarea>
-    <script src="https://gnab.github.io/remark/downloads/remark-latest.min.js">
+    <script src="./remark.min.js">
     </script>
     <script>
       var slideshow = remark.create({
@@ -1366,6 +1552,65 @@ Image credit:
     </script>
     <script>
     </script>
+
+    <script>
+      /*NOTE: uses localStorage to communicate between windows, which
+      doesn't work over the file:// so you need to run a local server */
+      /** Change selected line in code samples with n and o keypresses */
+      var body = document.getElementsByTagName('body')[0];
+      body.addEventListener("keydown", function(e){
+        console.log(e);
+        if (e.keyCode === 78){ // N
+          message_broadcast(-1);
+          moveSelection(-1);
+        } else if (e.keyCode == 79){ // O
+          message_broadcast(1);
+          moveSelection(1);
+        } else {
+          console.log('bad key code!', e.keyCode);
+        }
+      });
+      function moveSelection(offset){
+        console.log('called with offset', typeof offset, offset);
+        var allLines = $('.remark-visible .remark-code-line')
+        if (allLines.length === 0){
+          console.log("no code on current slide");
+          return;
+        }
+        var highlightedLines = $('.remark-visible .remark-code-line-highlighted')
+        var toHighlightIndex = 0;
+        if (highlightedLines.length === 0){
+          console.log('nothing highlighted, highlighting first line');
+        } else {
+          var firstHighlightedLine = allLines.index(highlightedLines.get(0));
+          console.log('first highlighted line:', firstHighlightedLine);
+          toHighlightIndex = Math.max(0, Math.min(firstHighlightedLine + offset, allLines.length - 1));
+        }
+        allLines.removeClass('remark-code-line-highlighted');
+        var lineToHighlight = allLines.slice(toHighlightIndex, toHighlightIndex+1);
+        console.log('want to highlight line', toHighlightIndex, ':',  lineToHighlight.get());
+        lineToHighlight.addClass('remark-code-line-highlighted');
+        // find current visible code
+        // find all remark-code-lines
+        // find all of these that are remark-code-line-highlighted
+        // 
+      }
+      function message_receive(ev){
+        if (ev.key !== 'message'){ return; }// ignore other keys
+        var message = JSON.parse(ev.newValue);
+        if (!message){ return; }// ignore empty msg or msg reset
+        moveSelection(message);
+      }
+
+      function message_broadcast(message) {
+        console.log('broadcasting message:', message);
+        localStorage.setItem('message',JSON.stringify(message));
+        localStorage.removeItem('message');
+      }
+      window.addEventListener('storage', message_receive);
+
+    </script>
+
 
   </body>
 </html>

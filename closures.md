@@ -28,6 +28,29 @@ Originally used by Landin apparently
 
 outline
 -------
+* intro: goals are to define closures and figure out if we have them in Python
+* two Python functions with the same code
+  * why?
+  * what happens when I change a global variable?
+    * interlude: Joel Moses asks this about another programming language
+    * It would be easy to look up the stack, but that's not what the
+      programmer usually wants.
+    * He used the name "closure" to describe the combination of the function
+      and the data structure storing the environment that will be used to
+      figure out how to "close" the free variables. So that's the thing
+      we should be on the lookout for in Python!
+  * A new global variable doesn't change behavior!
+  * "global" variables aren't - they're module level!
+  * live links
+  * so Python functions look awefully like closures: they're code plus the
+    module that represents the environment they were defined in.
+  * so what does happen in Python? How are these functions different?
+
+
+
+
+
+
 * Let's identify local variables and global variables.
 * How do we figure out the values of global variables?
 * Functions use the global variables from where they were written, not the one
