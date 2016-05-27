@@ -1,70 +1,198 @@
-# [fit] Finding closure with closures
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Title</title>
+    <meta charset="utf-8">
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+      @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+      body { font-family: 'Droid Serif'; }
+      h1, h2, h3, .listitemsfillwidth li {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: normal;
+      }
+
+      /*Custom styles for while slides*/
+      .huge h1 {
+        font-size: 5em;
+      }
+      .huge h2 {
+        font-size: 3em;
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+
+      .listitemsfillwidth ul{
+        list-style-type: none;
+        width: 100%;
+        padding-left: 0;
+        text-align: center;
+      }
+      .listitemsfillwidth.remark-slide-content {
+      }
+      .listitemsfillwidth li{
+        white-space:nowrap;
+        display: inline-block;
+        text-align: center;
+      }
+
+      .remark-code{
+        font-size: 1.6em;
+        overflow-x: visible !important;
+        margin-left: -100px;
+        margin-right: -100px;
+        margin-top: -100px;
+        padding-top: 80px !important;
+        padding-left: 35px !important;
+        line-height: 1.2em;
+        background: none !important;
+      }
+
+      .twofilescode .remark-code{
+        font-size: 1.4em;
+        padding-left: 60px !important;
+        padding-top: 120px !important;
+      }
+
+      .twoplanets img {
+        position: absolute;
+        opacity: 0.25;
+        margin-left: -94px;
+      }
+
+
+      /* speaker notes */
+      .remark-notes{
+        font-size: 1.3em;
+        line-height: 1.3em;
+      }
+
+    </style>
+    <script src="jquery-2.2.4.min.js"></script>
+    <script>
+      /* JQuery plugin to stretch li elements to fill ul
+       * Careful only to call this on visible elements!
+       */
+      /** call on ul elements to stretch inner li elements */
+      $.fn.stretchlis = function(){
+        this.each(function(){
+          var ul = this;
+          var maxWidth = $(this).width()
+          var lis = $('li', this);
+          lis.each( (i, li) => {
+            var fontSize = 1;
+
+            while ($(li).width() <= maxWidth * .95){
+              if (fontSize > 200){ throw Error('unreasonably big'); }
+              fontSize++;
+              $(li).css('font-size', fontSize);
+            }
+          });
+        });
+      }
+    </script>
+
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle, huge
+
+#Finding closure with closures
 
 ## Thomas Ballinger
 ## @ballingt
 
-^Hello!
-
 ---
 
-^
+???
 * "what are closures" interview question
-* giving words to ideas you're already familar with
 * answer "does Python even have closures?"
 * why don't we see nonlocal all that much
 
 ---
 
-## what closures are
-## Python functions have always been closures
-## how closures work in Python
-## Python 2.1 functions really are closures
-## Python 3 functions really really are closures
-## How we harness closures in Python (or not)
+class: listitemsfillwidth
 
-^Then we'll look at how it's used and I'll speculate a bit about why it isn't used.
+TODO: REWRITE THIS OUTLINE
+* what is a closure
+* Python functions have always been closures
+* how Python determines variable scope
+* Python 2.2: functions are really closures now
+* Python 3: now functions are definitely closures
 
 ---
+
+class: center huge
 
 # Closure:
 
 # code + environment
 
-^The notion that code of some kind - we'll say functions here - are more than
-their source code.
+???
+The notion of code you've written and environment it was written in joined together.
+This is an idea that a lot of programming languages have:
+that the source code of a function is not enough to determine its behavior,
+that we also need to know about the environment where that code was written.
+Only by putting these two things together can we get a working function.
+
+To see why that's something we might need, let me show you two Python functions.
 
 ---
 
-^Python functions are closures because the text of the function alone is not
-sufficient for Python to run the function.
-The environment where the function was defined is also used to determine its
-behavior.
-
----
-
-^I have two utility modules for formatting strings.
+???
+I have two utility modules for formatting strings.
 One is for html, the other is for outputting text to the terminal.
 (you know, the way text in the terminal is sometimes different colors)
 
-^I'm going to import these two functions, then look at their source code
+I'm going to import these two functions, then look at their source code
 with the inspect module, a Python standard library module.
+
+---
+
+~~~
+>>> 
+~~~
+
+???
+I'm going to open up the interactive Python interpreter
 
 ---
 
 ~~~
 >>> from htmlformat import bold as htmlbold
 >>> from terminalformat import bold as termbold
+>>>
 ~~~
 
 ---
 
 ~~~
+>>> from htmlformat import bold as htmlbold
+>>> from terminalformat import bold as termbold
+*>>> import inspect
+>>>
 
 
+
+
+
+
+
+~~~
+
+---
+
+~~~
+>>> from htmlformat import bold as htmlbold
+>>> from terminalformat import bold as termbold
 >>> import inspect
+*>>> print(inspect.getsource(htmlbold))
+*def bold(text):
+*   return '{}{}{}'.format(BOLDBEFORE, text, BOLDAFTER)
 
-
-
+>>>
 
 
 
@@ -74,49 +202,33 @@ with the inspect module, a Python standard library module.
 ---
 
 ~~~
-
-
-
+>>> from htmlformat import bold as htmlbold
+>>> from terminalformat import bold as termbold
+>>> import inspect
 >>> print(inspect.getsource(htmlbold))
 def bold(text):
     return '{}{}{}'.format(BOLDBEFORE, text, BOLDAFTER)
 
+*>>> print(inspect.getsource(termbold))
+*def bold(text):
+*   return '{}{}{}'.format(BOLDBEFORE, text, BOLDAFTER)
 
-
-
+>>>
 ~~~
 
 ---
 
+
 ~~~
+def bold(text):
+    return '{}{}{}'.format(BOLDBEFORE, text, BOLDAFTER)
 
-
-
-
-
-
-
->>> print(inspect.getsource(termbold))
 def bold(text):
     return '{}{}{}'.format(BOLDBEFORE, text, BOLDAFTER)
 ~~~
 
----
-
-~~~
-
-
-
->>> print(inspect.getsource(htmlbold))
-def bold(text):
-    return '{}{}{}'.format(BOLDBEFORE, text, BOLDAFTER)
-
->>> print(inspect.getsource(termbold))
-def bold(text):
-    return '{}{}{}'.format(BOLDBEFORE, text, BOLDAFTER)
-~~~
-
-^But when I use they, they're going to have different behavior.
+???
+But when I use they, they're going to have different behavior.
 There must be something beyond the source code that determines the behavior
 of these functions, and I assert that's the respective environments in which
 the functions were defined.
@@ -124,8 +236,9 @@ the functions were defined.
 ---
 
 ~~~
->>> htmlbold('eggplant')
-'<b>eggplant</b>'
+*>>> htmlbold('eggplant')
+*'<b>eggplant</b>'
+>>>
 
 
 ~~~
@@ -135,89 +248,108 @@ the functions were defined.
 ~~~
 >>> htmlbold('eggplant')
 '<b>eggplant</b>'
->>> termbold('eggplant')
-'\x1b[1meggplant\x1b[0m'
+*>>> termbold('eggplant')
+*'\x1b[1meggplant\x1b[0m'
+>>>
 ~~~
-
-^]
 
 ---
 
-^Hold onto that question of how what those environments are for a moment,
+???
+Hold onto that question of how what those environments are for a moment,
 we've got our first quiz:
 
 ---
 
 
-    >>> from htmlformat import bold as htmlbold
-    >>> BEFOREBOLD = 'Written in sharpie: '
-    >>> htmlbold('eggplant')
+~~~
+>>> from htmlformat import bold as htmlbold
+>>> BEFOREBOLD = '(write this in Sharpie) '
+>>> htmlbold('eggplant')
+~~~
 
-^What will this print?
-
----
-
-    >>> from htmlformat import bold as htmlbold
-    >>> BEFOREBOLD = 'Written in sharpie: '
-    >>> htmlbold('eggplant')
-    '<b>eggplant</b>'
-
-^Why is this?
-That's right these are different global variables!
+???
+What will this print?
 
 ---
 
-    #htmlformat.py                   #terminalformat.py
+~~~
+>>> from htmlformat import bold as htmlbold
+>>> BEFOREBOLD = '(write this in Sharpie) '
+>>> htmlbold('eggplant')
+'<b>eggplant</b>'
+~~~
 
-    BEFOREBOLD = '<b>'               BEFOREBOLD = '\x1b[1m'
-    AFTERBOLD = '</b>'               AFTERBOLD = '\x1b[0m'
+???
+That's right, these are different global variables!
 
-    def bold(text):                  def bold(text):
-        return '{}{}{}'.format(          return '{}{}{}'.format(
-          BOLDBEFORE,                      BOLDBEFORE,
-          text,                            text,
-          BOLDAFTER)                       BOLDAFTER)
+And now we have a hint of how those two bold functions
+might differ...
 
-^Different global variables, and it seems like they each use their own global variables!
+---
+class: twofilescode
+
+~~~
+#htmlformat.py                   #terminalformat.py
+
+*BEFOREBOLD = '<b>'               BEFOREBOLD = '\x1b[1m'
+*AFTERBOLD = '</b>'               AFTERBOLD = '\x1b[0m'
+
+def bold(text):                  def bold(text):
+    return '{}{}{}'.format(          return '{}{}{}'.format(
+      BOLDBEFORE,                      BOLDBEFORE,
+      text,                            text,
+      BOLDAFTER)                       BOLDAFTER)
+~~~
+
+
+???
+Different global variables, and it seems like they each use their own global variables!
 "global" is not a great name
 
 ---
+class: huge center
 
-#global variables aren't "global"
+#global variables aren't
 
-^They aren't universal across your whole program,
+???
+They aren't universal across your whole program,
 they're really module level variables.
 
 ---
 
-^Since we're stuck with the word "global," we should
+???
+Since we're stuck with the word "global," we should
 think of each module as being a separate globe...
 
 
 ---
+class: twofilescode twoplanets
 
 ![](https://upload.wikimedia.org/wikipedia/commons/2/2d/Venus_Earth_Comparison.png)
-
      
-     
-    #htmlformat.py                      #terminalformat.py
+~~~
+#htmlformat.py                   #terminalformat.py
 
-    BEFOREBOLD = '<b>'                  BEFOREBOLD = '\x1b[1m'
-    AFTERBOLD = '</b>'                  AFTERBOLD = '\x1b[0m'
+*BEFOREBOLD = '<b>'               BEFOREBOLD = '\x1b[1m'
+*AFTERBOLD = '</b>'               AFTERBOLD = '\x1b[0m'
 
-    def bold(text):                     def bold(text):
-        return '{}{}{}'.format(             return '{}{}{}'.format(
-          BOLDBEFORE,                         BOLDBEFORE,
-          text,                               text,
-          BOLDAFTER)                          BOLDAFTER)
+def bold(text):                  def bold(text):
+    return '{}{}{}'.format(          return '{}{}{}'.format(
+      BOLDBEFORE,                      BOLDBEFORE,
+      text,                            text,
+      BOLDAFTER)                       BOLDAFTER)
+~~~
 
-^Modules as being separate globes
+???
+Modules as being separate globes
 
 ---
 
 ![](./peridotplanet.png)
 
-^And our function objects have a link to their home world,
+???
+And our function objects have a link to their home world,
 they know where they came from.
 
 ---
@@ -232,7 +364,8 @@ they know where they came from.
 
 ```
 
-^On the function object we find a reference to both the name of the module
+???
+On the function object we find a reference to both the name of the module
 where it was defined, and more importantly to the dictionary of the global
 variables in the module.
 
@@ -248,7 +381,8 @@ dict_keys(['BEFOREBOLD', 'AFTERBOLD', 'bold',
 '__package__', '__doc__', '__loader__', '__file__'])
 ```
 
-^On the function object we find a reference to a dictionary of the global variables
+???
+On the function object we find a reference to a dictionary of the global variables
 
 ---
 
@@ -266,21 +400,26 @@ True
 
 ```
 
-^The other important thing about this is that
+???
+The other important thing about this is that
 this is a live link back to that home planet!
 It's the very same object as the namespace of the module!
 
 
 ---
 
-^Because these are the same namespace, what if we were to change a binding in that namespace?
+???
+Because these are the same namespace, what if we were to change a binding in that namespace?
 
 ---
 
-    BEFOREBOLD = '<span class="bold">
-    AFTERBOLD = '</span>'
+~~~
+BEFOREBOLD = '<span class="bold">'
+AFTERBOLD = '</span>'
+~~~
 
-^What happens when I add this code to the bottom on htmlformat?
+???
+What happens when I add this code to the bottom on htmlformat?
 
 ---
 
@@ -300,7 +439,8 @@ It's the very same object as the namespace of the module!
     BEFOREBOLD = '<span class="bold">
     AFTERBOLD = '</span>'
 
-^Modules as being separate globes
+???
+Modules as being separate globes
 
 ---
 
@@ -313,12 +453,14 @@ It's the very same object as the namespace of the module!
     >>> bold('eggplant')
     '<span class="bold">eggplant</span>
 
-^We're going to use the new values because it's about the values
+???
+We're going to use the new values because it's about the values
 of the variables when we call the function, not when we define the function.
 
 ---
 
-^We can even modify these variables from outside the module!
+???
+We can even modify these variables from outside the module!
 
 ---
 
@@ -335,11 +477,13 @@ of the variables when we call the function, not when we define the function.
     >>> bold('eggplant')
     'READTHIS--> eggplant</span>
 
-^Once again, it's about the value of the variable when the function is called.
+???
+Once again, it's about the value of the variable when the function is called.
 
 ---
 
-^Sometimes it's hard not to expect templating behavior of using the value of a variable at the time the function was defined instead of at the time when the function is called.
+???
+Sometimes it's hard not to expect templating behavior of using the value of a variable at the time the function was defined instead of at the time when the function is called.
 
 ---
 
@@ -354,7 +498,8 @@ for color in colors:
 
 formatters['green']('hello')
 ~~~
-^What will this do?
+???
+What will this do?
 
 ---
 
@@ -370,7 +515,8 @@ for color in colors:
 print(color)
 formatters['green']('hello')
 ~~~
-^Does this help?
+???
+Does this help?
 
 ---
 
@@ -380,19 +526,22 @@ formatters['green']('hello')
 
 #[fit]Python functions: totally closures!
 
-^ By this broad definition of being a combination of code and environment.
+???
+By this broad definition of being a combination of code and environment.
 One important detail and one big idea:
 * Python functions hold references to their module evironments
 * These are live links: current values of variables
 
-^Next let's look at how Python figures out how to close the
+???
+Next let's look at how Python figures out how to close the
 variables we use in a function
 
 ---
 
 # How closures work in Python
 
-^At function definition time, Python analyzes our code
+???
+At function definition time, Python analyzes our code
 to decide which variables are going to be looked up in
 the home module, and which ones don't need to be.
 For as long as Python has been available on the internet,
@@ -403,7 +552,8 @@ there have been at least two kinds of variables:
 * local variables: `func.__code__.co_varnames`
 * "phone home" global variables: `func.__code__.co_names`
 
-^When Python builds a function object, it categorizes names.
+???
+When Python builds a function object, it categorizes names.
 Let's be the interpreter and look for patterns in our decisions
 about which is which.
 
@@ -417,7 +567,8 @@ about which is which.
 ...     return capitalized + ": The Untold Story"
 ~~~
 
-^Is phrase a local variables, or module-level "global" variable?
+???
+Is phrase a local variables, or module-level "global" variable?
 
 ---
 
@@ -532,7 +683,8 @@ about which is which.
 ('DEFAULT_TITLE', 'catchiness')
 ~~~
 
-^If its important that that function is defined in that file - i.e. you can't
+???
+If its important that that function is defined in that file - i.e. you can't
 copy and paste it into your file - then it's closing over the environment.
 
 ---
@@ -544,7 +696,8 @@ copy and paste it into your file - then it's closing over the environment.
 ...     return options[1]
 ~~~
 
-^Something tricky: one of the things Python uses to determine if it's a local
+???
+Something tricky: one of the things Python uses to determine if it's a local
 variables is whether assignment occurs. But what if you wanted to assign to a global variable?
 
 ---
@@ -558,7 +711,8 @@ variables is whether assignment occurs. But what if you wanted to assign to a gl
 ... 
 >>> new_high_score(1042)
 ~~~
-^What error will we get here?
+???
+What error will we get here?
 
 ---
 
@@ -576,7 +730,8 @@ Traceback (most recent call last):
 UnboundLocalError: local variable 'HIGH_SCORE'
 referenced before assignment
 ~~~
-^Why is that? Because HIGH_SCORE is a local variable!
+???
+Why is that? Because HIGH_SCORE is a local variable!
 
 ---
 
@@ -609,12 +764,14 @@ congrats on the high score!
 old high score: 1000
 ~~~
 
-^So the global keyword lets us bypass Python's heuristic and specify the scope
+???
+So the global keyword lets us bypass Python's heuristic and specify the scope
 of a variable
 
 ---
 
-^How are we doing so far?
+???
+How are we doing so far?
 
 ---
 
@@ -640,11 +797,13 @@ of a variable
 ~~~
  
 ~~~
-^BUT big changes were coming in Python 2.1
+???
+BUT big changes were coming in Python 2.1
 
 ---
 
-^Functions in Python have always closed over their module-level environment.
+???
+Functions in Python have always closed over their module-level environment.
 But before Python 2.1 in 2000, functions didn't close over scopes of outer
 functions!
 
@@ -662,7 +821,8 @@ def tallest_building():
     return max(buildings.keys(), key=height)
 ~~~
 
-^let's be the interpreter here
+???
+let's be the interpreter here
 
 ---
 
@@ -679,7 +839,8 @@ def tallest_building():
 ~~~
 #name
 
-^if you're being the interpreter, is name a local or a global variable?
+???
+if you're being the interpreter, is name a local or a global variable?
 
 ---
 
@@ -696,10 +857,12 @@ def tallest_building():
 ~~~
 #buildings
 
-^if you're being the interpreter, how do categorize the "buildings" variable?
+???
+if you're being the interpreter, how do categorize the "buildings" variable?
 
 ---
-^Sometimes when people talk about closures, they aren't including module-level
+???
+Sometimes when people talk about closures, they aren't including module-level
 scope, or rather they might say that module-level "global" variables are a special case.
 In Python their implementation is a special case; they're treated differently.
 
@@ -709,7 +872,8 @@ In Python their implementation is a special case; they're treated differently.
 * "phone home" global variables: `func.__code__.co_names`
 * "phone home" outer non-global scopes: `func.__code__.co_freevars`
 
-^A new kind of variable
+???
+A new kind of variable
 
 ---
 
@@ -722,17 +886,32 @@ In Python their implementation is a special case; they're treated differently.
 ('buildings',)
 ~~~
 
-^This was optional in Python 2.1, but
+???
+This was optional in Python 2.1, but
 
 ---
 
 #[fit]Python 2.2 functions: definitely closures now!
 
-^Also in the year 2001
+???
+Also in the year 2001
 
 ---
 
-^At thing point function objects got an attribute called "__closure__"!
+#New definition of closures:
+
+##A function that references an outer, non-global scope
+
+???
+Why? mostly for implementation reasons: global scope is implemented differently
+than access to outer scopes. We can't reach out and touch that scope
+the way we can global variables, so it doesn't count.
+
+---
+
+Some support for this definition: func.__closure__
+???
+At thing point function objects got an attribute called "__closure__"!
 
 ---
 
@@ -747,16 +926,19 @@ In Python their implementation is a special case; they're treated differently.
 #[fit]Python 2.7 Scope Expert
 
 #[fit]MMVIII (the year 2008)
-^One more change big change was coming in Python 3
+???
+One more change big change was coming in Python 3
 
 ---
 
-^There's still one more thing we can't do, a way that our Python closures are more limited than those of some other languages.
+???
+There's still one more thing we can't do, a way that our Python closures are more limited than those of some other languages.
 Remember the problem with global variables, where if we want to assign to a global variable in a function we need to say "global"?
 
 ---
 
-^That leads to the phrase "read-only" closures.
+???
+That leads to the phrase "read-only" closures.
 We can access those variables, and if they're mutable objects we can send them
 messages, we can mutate them - but we can't rebind them.
 
@@ -775,7 +957,8 @@ messages, we can mutate them - but we can't rebind them.
 >>> guess(9)
 
 ~~~
-^But this isn't going to work. Let's be the interpreter again to see why.
+???
+But this isn't going to work. Let's be the interpreter again to see why.
 
 ---
 
@@ -790,7 +973,8 @@ messages, we can mutate them - but we can't rebind them.
 ~~~
 #[fit]n
 
-^If we're being the Python interpreter here, are these local variables, global
+???
+If we're being the Python interpreter here, are these local variables, global
 variables, or from an outer scope?
 
 ---
@@ -819,7 +1003,8 @@ variables, or from an outer scope?
 ~~~
 #[fit]last_guess
 
-^It's going to think it's a local variable because we use assignment here.
+???
+It's going to think it's a local variable because we use assignment here.
 So what error will we get when we run that inner function?
 
 ---
@@ -841,7 +1026,8 @@ Traceback (most recent call last):
 UnboundLocalError: local variable 'last_guess' referenced before assignment
 ~~~
 
-^One last puzzle piece: nonlocal!
+???
+One last puzzle piece: nonlocal!
 
 ---
 
@@ -856,7 +1042,8 @@ UnboundLocalError: local variable 'last_guess' referenced before assignment
 ... 
 ~~~
 
-^Add a hint to the Python interpreter when we define the function:
+???
+Add a hint to the Python interpreter when we define the function:
 we mean the outer variable, not a new one.
 
 ---
@@ -883,7 +1070,8 @@ False
 
 #[fit]Python functions are definitely closures now!
 
-^OK? Feeling alright with that?
+???
+OK? Feeling alright with that?
 
 ---
 
@@ -899,35 +1087,41 @@ False
 
 #[fit]MMVIII (the year 2016)
 
-^Now you're totally up to date with scope in Python.
+???
+Now you're totally up to date with scope in Python.
 
-^What's left is how closures are used in Python.
+???
+What's left is how closures are used in Python.
 
 ---
 
 #[fit]How closures are used in Python
 
-^one answer is anytime you use a function, that's a closure
+???
+one answer is anytime you use a function, that's a closure
 
 ---
 
 #[fit]Global variables
 #[fit]`(`any function with`.__code__.co_names``)`
 
-^Any time those phone-home variables are used, those are closures!
+???
+Any time those phone-home variables are used, those are closures!
 If you function calls other functions in the same module, that's using the
 fact that the function is a closure!
 
 ---
 
-^or maybe we aren't counting that, and it only counts when
+???
+or maybe we aren't counting that, and it only counts when
 
 ---
 
 #[fit]Variables from outer scopes besides globals
 #[fit]`(`any function with`.__code__.co_freevars``)`
 
-^Sometimes functions that use those module-level "global" variables aren't
+???
+Sometimes functions that use those module-level "global" variables aren't
 considered closures because we're so used to that behavior, so when
 do we use those `co_freevars` from outer functions?
 
@@ -942,7 +1136,8 @@ do we use those `co_freevars` from outer functions?
   * atexit
   * ...
 
-^Someimes these are "pure" functions, but often they use state from arround
+???
+Someimes these are "pure" functions, but often they use state from arround
 Whenever you write a function that does something interesting.
 
 ---
@@ -955,7 +1150,8 @@ def get_current_time():
     return requests.get('http://time.is')
 ~~~
 
-^Decorators usually define a new function that references the old one.
+???
+Decorators usually define a new function that references the old one.
 
 ---
 
@@ -963,7 +1159,8 @@ def get_current_time():
 
 ---
 
-^What about the definition of closure that says you have to be able to rebind
+???
+What about the definition of closure that says you have to be able to rebind
 the variables in outer scopes that aren't the global scope?
 
 ---
@@ -972,9 +1169,11 @@ the variables in outer scopes that aren't the global scope?
 #[fit]"rebinding" closures
 #[fit]nonlocal keyword
 
-^These ones aren't used as much.
+???
+These ones aren't used as much.
 
-^One reason why not is that many people still write code
+???
+One reason why not is that many people still write code
 that works on both Python 3 and Python 2.
 
 ---
@@ -990,13 +1189,15 @@ def decorating_function(user_function):
 ~~~
 heavily abridged [Django code](https://github.com/django/django/blob/master/django/utils/lru_cache.py#L80) from utils/lru_cache.py
 
-^Real-world examples often use the *pattern* of nonlocal, but do it with
+???
+Real-world examples often use the *pattern* of nonlocal, but do it with
 a workaround: stick the variable in a mutable object!
 
 
 ---
 
-^We have modules, we have a nice object system (method binding)...
+???
+We have modules, we have a nice object system (method binding)...
 
 ---
 
@@ -1009,11 +1210,13 @@ def tallest_building():
     return max(buildings.keys(), key=buildings.get)
 ~~~
 
-^Method binding, and we don't hide data...
+???
+Method binding, and we don't hide data...
 
 ---
 
-^The next code sample is the most complicated one we've seen yet.
+???
+The next code sample is the most complicated one we've seen yet.
 
 ---
 
@@ -1037,62 +1240,76 @@ Traceback (most recent call last):
 AttributeError: 'Problem' object has no attribute 'age'
 ~~~
 
-^(explain this)
+???
+(explain this)
 
-^Now this is totally possible in JavaScript and Python. But culturally we
+???
+Now this is totally possible in JavaScript and Python. But culturally we
 don't do it in Python.
 
 ---
 
 #[fit]Getting our closure
 
-^And I think it's fine that we don't use rebinding closures all that much.
+???
+And I think it's fine that we don't use rebinding closures all that much.
 
 ---
 
 #[fit]use `nonlocal` when appropriate
 
-^So why use nonlocal? Because it more precisely expresses what we mean!
+???
+So why use nonlocal? Because it more precisely expresses what we mean!
 No need to go looking for uses of it, but they do pop up!
 
 ---
 
 #[fit]Getting our closure
 
-^Closures are code + environment
+???
+Closures are code + environment
 
-^Functions in Python are closures because they rely on the environment where they were defined to execute
+???
+Functions in Python are closures because they rely on the environment where they were defined to execute
 
-^A general definition includes module-level global variables,
+???
+A general definition includes module-level global variables,
 more common definitions only include variables from outer scopes
 that aren't the global scope.
 
-^Sometimes we say only functions that use this capability are closures.
+???
+Sometimes we say only functions that use this capability are closures.
 
 ---
 
 #[fit]Getting our closure
 
-^Sometimes we mean rebinding closures, all of which Python has!
+???
+Sometimes we mean rebinding closures, all of which Python has!
 
 ---
 
 #[fit]Getting our closure
 
-^When people that use other languages talk about the tremendous power of
+???
+When people that use other languages talk about the tremendous power of
 closures, we can join right in!
 
-^We use closures all the time in Python, just look for .co_freevars on your function objects if you're wondering if something is taking advantage of being a closure.
+???
+We use closures all the time in Python, just look for .co_freevars on your function objects if you're wondering if something is taking advantage of being a closure.
 
 ---
 
 #[fit]Closure closures closed closures closure clojure closures.
 
-^So hopefully I've helped you find closure with closures, I know writing this talk helped me get to that point.
+???
+So hopefully I've helped you find closure with closures, I know writing this talk helped me get to that point.
 
-^This doesn't make sense but I've used the word a lot so found it funny.
+???
+This doesn't make sense but I've used the word a lot so found it funny.
 
-^Thank you!
+???
+Thank you!
 
 ---
 
@@ -1116,3 +1333,39 @@ Image credit:
 * bytecode: what does "compiling" a function really mean?
 * descriptors and method binding: the dark secret that turns functions into methods
 * scopes of various comprehensions and generator expressions
+* "The Function of FUNCTION in LISP..." - Joel Moses, 1970
+* 
+
+
+    </textarea>
+    <script src="https://gnab.github.io/remark/downloads/remark-latest.min.js">
+    </script>
+    <script>
+      var slideshow = remark.create({
+        highlightLanguage: 'python',
+        highlightLines: true,
+        highlightStyle: 'github',
+      });
+    </script>
+
+    <script>
+    /** Returns a filter function looking for this slide number */
+    function isSlide(n){
+      return function(i, el){
+        slidenum = (/(\d+)/).exec($('.remark-slide-number', this).text())[0];
+        return n == slidenum;
+      }
+    }
+    slideshow.on('afterShowSlide', function (slide) {
+      $('.remark-slide')
+      .filter(isSlide(slide.getSlideIndex() + 1))
+      .each(function(){
+        $(".listitemsfillwidth ul", this).stretchlis();
+      });
+    });
+    </script>
+    <script>
+    </script>
+
+  </body>
+</html>

@@ -1,4 +1,63 @@
+Feedback:
 
+Tell us what closures are!
+
+examples were wrong wrt something (an attribute wasn't in co_names)
+
+show us how to fix the scope issues!
+
+the planets were the best
+
+make audience interaction multiple choice so it happens more
+
+
+foo.__code__.co_names is everything else - yes globals go here, but so do attributes
+
+
+
+Definitions
+
+When a lambda expression is to be evaluated, because it was passed as an argument, it evaluates to a closure of that lambda expression in the environment it is evaluated in (i.e., the environment it was passed from):
+
+Sussman and Steele
+https://en.wikisource.org/wiki/Page:Scheme_-_An_interpreter_for_extended_lambda_calculus.djvu/22
+
+
+Originally used by Landin apparently
+
+
+outline
+-------
+* Let's identify local variables and global variables.
+* How do we figure out the values of global variables?
+* Functions use the global variables from where they were written, not the one
+  here.
+* First off, global variable aren't global
+
+
+
+Closures are a solution to the problem, when designing a programming language,
+of what to do with "free" variables.
+
+
+
+
+
+def foo(x, y):
+    "No free variables"
+    return x + y
+
+def bar():
+    "two free variables"
+    return x + y
+
+
+
+
+
+
+#A function with free variables
+#A function that doesn't work when you copy and paste from Stack Overflow (by itself)
 
 
 * Intro

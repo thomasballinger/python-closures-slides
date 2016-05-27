@@ -4,10 +4,11 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<title>reveal.js</title>
+		<title>Finding closure with closures</title>
 
 		<link rel="stylesheet" href="css/reveal.css">
-		<link rel="stylesheet" href="css/theme/black.css">
+		<link rel="stylesheet" href="css/theme/simple.css">
+		<link rel="stylesheet" href="custom.css">
 
 		<!-- Theme used for syntax highlighting of code -->
 		<link rel="stylesheet" href="lib/css/zenburn.css">
@@ -20,12 +21,35 @@
 			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
 			document.getElementsByTagName( 'head' )[0].appendChild( link );
 		</script>
+
 	</head>
 	<body>
 		<div class="reveal">
 			<div class="slides">
-				<section>Slide 1</section>
-				<section>Slide 2</section>
+				<section>
+          <h1>Finding closure with closures</h1>
+          <h2>Tom Ballinger</h2>
+          <h2>@ballingt</h2>
+        </section>
+        <section> </section>
+				<section>
+          <h3>what is a closure?</h3>
+          <h3>Python functions have always been closures</h3>
+          <h3>determin Python</h3>
+          <h3>Python 2.1 functions really are closures</h3>
+          <h3>Python 3 functions really really are closures</h3>
+          <h3>How we harness closures in Python (or not)</h3>
+        </section>
+				<section>
+          <ul class="bigcenterlist fillwidth">
+            <li>what is a closure?</li>
+            <li>Python functions have always been closures</li>
+            <li>where Python gets values</li>
+            <li>Python 2.1 functions really are closures</li>
+            <li>Python 3 functions really really are closures</li>
+            <li>How we harness closures in Python (or not)</li>
+          </ul>
+        </section>
 			</div>
 		</div>
 
@@ -36,6 +60,7 @@
 			// More info https://github.com/hakimel/reveal.js#configuration
 			Reveal.initialize({
 				history: true,
+        center: false,
 
 				// More info https://github.com/hakimel/reveal.js#dependencies
 				dependencies: [
