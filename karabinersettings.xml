@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<root>
+    <!-- I use these Karabiner (key remap software) settings on my mac to map volume control to N and O.
+         Can't use jk because that's forward/back in remark.
+         Can't use p instead of o because that's presentor notes
+         -->
+
+  <item>
+    <name>Presenter Controls JK</name>
+    <appendix>For preseter constrols that have volume buttons, to use with code highlighting tools</appendix>
+    <identifier>PresenterControlsJK</identifier>
+    <autogen>__KeyToKey__ ConsumerKeyCode::VOLUME_DOWN, KeyCode::N</autogen>
+    <autogen>__KeyToKey__ ConsumerKeyCode::VOLUME_UP, KeyCode::O</autogen>
+  </item>
+
+</root>
