@@ -81,7 +81,6 @@
         font-size: 1.4em;
       }
 
-
       .remark-code{
         font-size: 1.6em;
         overflow-x: visible !important;
@@ -186,7 +185,8 @@ class: center, middle, huge
 ???
 * A friend of mine was asked what are closures was at a programming interview a few years ago.
 Who here would have something to say in response to that question?
-My friend was pretty competent with Python and JavaScript and took advantage of closures in his code all the time. I hope today we leave here with something to say on that topic.
+My friend was pretty competent with Python and JavaScript and took advantage of closures in his code all the time. I hope today we leave here with something to say on that topic if we're asked.
+
 * I worked for several years at a programming retreat where programmers more familiar with other languages would sometimes ask me "does Python even have closures?" I hope we leave here with something to say to that as well.
 
 ---
@@ -394,6 +394,20 @@ function, not new variables at their functions' call sites.
 ...     BEFOREBOLD = '(in Sharpie) '
 ...     return htmlbold(phrase)
 ...
+*>>> signbold('eggplant')
+~~~
+
+???
+With that in mind, will "in Sharpie" print here, or will we get the old behavior of the bold tags?
+
+---
+
+~~~
+>>> from htmlformat import bold as htmlbold
+>>> def signbold(phrase):
+...     BEFOREBOLD = '(in Sharpie) '
+...     return htmlbold(phrase)
+...
 >>> signbold('eggplant')
 *'<b>eggplant</b>'
 ~~~
@@ -568,7 +582,7 @@ background-image: url(./theFunctionOfFunction.png)
 
 ???
 In that same paper, Joel Moses described an implementation of this type of behavior.
-For a function to behave this way, it nees both the code it will execute ad the environment
+For a function to behave this way, it needs both the code it will execute and the environment
 which closes the free variables used by that function.
 
 He called this...
@@ -621,9 +635,6 @@ def bold(text):
 *BEFOREBOLD = '<span class="bold">'
 *AFTERBOLD = '</span>'
 ~~~
-
-???
-Modules as being separate globes
 
 ---
 
@@ -796,7 +807,7 @@ class: huge center
 
 ???
 A Python function object is the result of this process, with each
-of its attribute storing a different piece of computer-readable
+of its attribute storing a different piece of
 information about the function.
 
 --
@@ -1137,7 +1148,7 @@ Well then congratulations, that's all there is to scope all the way up to Python
 Python functions have always closed over their their module-level environments, and
 there were no big changes in how scope worked up to Python 2.0.
 
-But in Python 2 an important method of closing free variables wasn't available to
+But in Python 2.0 an important method of closing free variables wasn't available to
 us, one required by most people to classify a function as a closure:
 closing over outer scopes that are not the global scope.
 
@@ -1226,7 +1237,7 @@ in Python 2.0 and calling it produces this error.
 # "phone home" outer non-global scopes: `func.__code__.co_freevars`
 
 ???
-Optionally in Python 2.1 as a __future__ import, then by default in Python
+Optionally in Python 2.1 as a `__future__` import, then by default in Python
 2.2, variables from outer non-global scopes were added and are found at
 `.__code__.co_freevars`:
 
@@ -1248,13 +1259,13 @@ Once that function finally compiles it looks like this
 ---
 
 ???
+Now that we're closing over these scopes, we've got all the outer scopes covered:
+we're definitely talking about closures now.
+
 Usually when people talk about closures, they aren't thinking about module-level
 scope, or rather they might say that module-level "global" variables are a special case.
 
-But once we start closing over these scopes, we've got all the outer scopes covered:
-we're definitely talking about closures now.
-
-It's probably fair to treate global variables as a special case because in Python their implementation is a special case; storing the global environment is much easier.
+It's probably fair to treat global variables as a special case because in Python their implementation is a special case; storing the global environment is much easier.
 
 ---
 
@@ -1263,8 +1274,8 @@ It's probably fair to treate global variables as a special case because in Pytho
 You may already be familiar with module
 objects in Python: generally they're singletons, so a given module has only
 one mapping of variables to values. But a function can be run many times,
-producing many different mappings of variables to values, each of which must
-be kept track of. A different environment must be tracked for each invocation of
+producing many different mappings of variables to values.
+A different environment must be tracked for each invocation of
 the function that produces function objects.
 
 ---
@@ -1334,7 +1345,7 @@ class: threemoons
 ~~~
 formatters = {}
 colors = ['red', 'green', 'blue']
-*def make_color_func(color):
+def make_color_func(color):
     def in_color(s):
         return ('<span style="color:' +
                 color + '">' + s + '</span>')
@@ -1363,19 +1374,19 @@ class: widecode
 Precisely how these are maintained by Python is out of scope for this talk,
 but the `.__closure__` attribute on the three produced functions provides some
 hint. If a function has this attribute set to something other than None then it
-has free variables which refer to variabels in outer, non-global scopes.
+has free variables which refer to bindings in outer, non-global scopes.
 
 
 ---
 
 ???
 We've reached the most common definition of a closure: a function with
-variables closed by an outer, non-global scope.
+free variables closed by an outer, non-global scope.
 However another fork in definitions occurs here: some would call our three
 color functions closures and but not the earlier height function because it was used
 in the same scope it was defined. Although CPython doesn't implement the two any
 differently, you could imagine that it becomes more difficult to maintain the
-environment a function to evaluate its variables once the bindings it needs
+environment a function needs to evaluate its variables once the bindings it needs
 goes out of scope. The distinction here is that looking up the stack instead
 of the "closure" solution of code + environment would result in the same
 behavior in the first case, making whether a function was a closure or not
@@ -1396,7 +1407,7 @@ class: huge center
 #...
 
 ???
-Well, just about, but there is one more thing.
+Well, yeah, but there is one more thing.
 
 ---
 class: certificate
@@ -1411,7 +1422,7 @@ You're a Python 2 scope expert now! But...
 ---
 
 ???
-But if rumblings of the insufficiency of Python's closures have ever
+But if rumblings of the insufficiency of Python 2's closures have ever
 reached your ears, you may not have found your closure yet.
 
 ---
@@ -1432,7 +1443,8 @@ There's still one more thing we can't do, a way that our Python closures are mor
 
 ???
 Remember the problem with global variables, where if we want to assign to a global variable in a function we need to say "global"?
-That leads to the phrase "read-only" closures.
+If we didn't have that global keyword our global variables were "read-only?"
+Not being able to assign to a nonlocal variables because that would make it a local variables leads to the phrase "read-only" closures.
 We can access those variables, and if they're mutable objects we can send them
 messages, we can mutate them - but we can't rebind them.
 
@@ -1472,7 +1484,7 @@ class: guess
 
 ???
 If we're being the Python interpreter here, are these local variables, global
-variables, or from an outer scope?
+variables, or nonlocal variables?
 
 ---
 class: guess
@@ -1572,9 +1584,7 @@ class: center, huge
 #Python functions are definitely closures now!
 
 ???
-Nonlocal mutable objects can be mutated for a similar effect, but the identity
-of the object in an outer binding cannot be changed. But since Python 3,
-we definitely have "full" closures now; there are no more missing details.
+"rebinding closures"
 
 As with the global keyword the change in semantics may seem small, but its
 lack is met with incredulity in Python 2 by those familiar with closures in
@@ -1594,7 +1604,8 @@ background-image: url(./certificate.jpg)
 Now you're totally up to date with scope in Python.
 
 ???
-What's left is how closures are used in Python.
+Now we know what know what closures are and that Python has them,
+what's left is how closures are used in Python.
 
 ---
 class: center
@@ -1602,9 +1613,10 @@ class: center
 #How closures are used in Python
 
 ???
+Closures are used all over the place.
 We can inspect a function for its `.__closure__` attribute
 to see if it contains free variables that are closed by outer, nonlocal
-scopes for those who demand this of their closures.
+scopes.
 
 ---
 class: largelist
@@ -1620,18 +1632,24 @@ class: largelist
 * decorators
 
 ???
-Someimes these are "pure" functions, but often they use state from arround
+Sometimes these are "pure" functions, but often they use state from arround
 Whenever you write a function that does something interesting.
 
 ---
 class: huge
 
-# decorators
-
 ~~~
 @retry
 def get_current_time():
     return requests.get('http://time.is')
+
+def retry(func):
+    def new_func():
+        try:
+            return func()
+        except:
+            return func()
+    return new_func
 ~~~
 
 ???
@@ -1640,7 +1658,14 @@ function to replace it, which itself typically holds a reference to the old
 function through a free variable from the outer function scope of the
 decorator.
 
+There is one more aspect I'm staring to want closure on: how did we get along
+without `nonlocal` for so long? Many people still use Python 2 code, how do they
+get along without it? And in Python 3 code,
+
 ---
+class: huge center
+
+#Why isn't nonlocal used much?
 
 ???
 Adding the nonlocal keyword took nine years, from Python 2.2 in 2001 to Python 3 in 2008.
@@ -1650,11 +1675,12 @@ Even now that the nonlocal
 is here, the need for compatibility with Python 2 code that many library authors
 have prevents some uses. Consider this abridged excerpt from Django:
 ---
+class: widecode
 
 ~~~python
 def decorating_function(user_function):
     ...
-    nonlocal_root = [root]  # make updateable non-locally
+    nonlocal_root = [root] # make updateable non-locally
 
     def wrapper():
         nonlocal_root[0] = oldroot[NEXT]
@@ -1670,7 +1696,12 @@ a workaround: stick the variable in a mutable object!
 ---
 
 ???
-We have modules, we have a nice object system (method binding)...
+We already have modules and the global keyword,
+a bigger one is that we have a nice object system (method binding)...
+
+If you need a callback that changes some state, instead of using nonlocal
+we'll often take that state and stick it in an object, and use methods
+to telegraph that we're modifying state.
 
 ---
 
@@ -1686,13 +1717,17 @@ def tallest_building():
 ~~~
 
 ???
+(explain this)
+
 And finally I posit a cultural reason: Python programmers tend to be
 comfortable with private data being externally accessible. Python and
 JavaScript are relatively similar languages, and both lack (or in certain
 versions have lacked) private object data which can be accessed by methods
 of the object by not by outside code, instead using conventions like a single
 underscore to inform users that such a variable is not part of the public
-interface with that object. In both languages the following
+interface with that object.
+
+There's a pattern that uses nonlocal that in both languages is possible,
 pattern is possible, but in JavaScript it is commonplace while in Python it is
 unheard of.
 
@@ -1751,16 +1786,9 @@ class: center
 
 #Getting our closure
 ##What are closures and does Python have them?
+
 ???
-Some modern Python functions are most certainly closures: whether it's all of them
-or just a few depends on the definition: is it enough to be capable of
-referring to variables from outer scopes (all Python functions), or must the
-functions make use of this ability? Must these outer scopes not be global?
-Must the scopes reference by the free variables go out of scope to prove their
-mettle as closures, or is storing the environment such that the variables
-could go out of scope enough?. And must closures be able to rebind these
-free variables, disqualifying all Python 2 functions?
-Closures are code + environment
+Closures are the combination of code and environment - all Python functions!
 
 ---
 class: center listitemsfillwidth
@@ -1776,15 +1804,32 @@ class: center listitemsfillwidth
 The original definition was just carrying the environment with the function,
 but new definitions have arisen.
 
-Python has all of these!
+Personally, I like "functions which close over nonlocal variables"
+It's fine if thosed closed over variables don't actually go out of scope,
+the fact that they could is enough.
+
+---
+class: center
+#they refer to variables from outer, non-global scopes
+???
+those variables don't have to be out of scope yet
+
+And I think it's worth keeping module-level scope in mind, it's not the
+whole environment but it's a piece.
+
 ---
 class: center
 
 #Getting our closure
 ##Does Python even have closures?
 
+???
+Python has all of these!
 --
 ##"Yes, Python functions can refer to variables in outer scopes even after those variables have gone out of scope."
+--
+
+#(since Python 2.2 in 2001)
 
 ???
 I like the "all Python 2.2 and greater functions are closures" answer, but
@@ -1798,8 +1843,8 @@ class: reflist
 * bytecode: what does "compiling" a function really mean?
 * descriptors and method binding: the dark secret that turns functions into methods
 * scopes of various comprehensions and generator expressions
-* "The Function of FUNCTION in LISP..." - Joel Moses, 1970
-* PEP 227: Statically Nested Scopes - includes notes on closure implementation
+* "The Function of FUNCTION in LISP..." Joel Moses, 1970
+* PEP 227 Statically Nested Scopes: includes notes on closure implementation
 * Ned Batchelder's names talk
 
 ???
@@ -1807,7 +1852,7 @@ Unfortunately we don't have time for questions, but I'd love to take them outsid
 
 These are some of the topics I'd love to talk about or recommend for further reading.
 
-I hope I've helped you all find closure with closures. Thank you!
+I hope I've helped you all find closure with closures. Thank so much for coming!
 ---
 class: huge center thankyou
 
